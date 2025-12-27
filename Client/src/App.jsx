@@ -8,16 +8,16 @@ const App = () => {
   const [room, setRoom] = useState("");
   const [showChat, setShowChat] = useState(false);
 
-  // ✅ Keep socket instance stable
   const socketRef = useRef(null);
-
-  // ✅ Keep audio instance stable
   const notificationRef = useRef(new Audio(music));
 
   useEffect(() => {
     socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
-      transports: ["websocket"],
+      transports: ["polling", "websocket"], // ✅ REQUIRED for Render
       withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
     });
 
     return () => {
@@ -31,7 +31,6 @@ const App = () => {
     socketRef.current.emit("join_room", room);
     setShowChat(true);
 
-    // play sound safely
     notificationRef.current.currentTime = 0;
     notificationRef.current.play().catch(() => {});
   };
@@ -59,11 +58,7 @@ const App = () => {
           <button onClick={joinChat}>Join</button>
         </div>
       ) : (
-        <Chat
-          socket={socketRef.current}
-          username={username}
-          room={room}
-        />
+        <Chat socket={socketRef.current} username={username} room={room} />
       )}
     </>
   );
