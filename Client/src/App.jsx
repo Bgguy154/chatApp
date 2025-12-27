@@ -2,9 +2,8 @@ import React, { useState } from 'react'
 import io from 'socket.io-client'
 import { Chat } from './Chat'
 import music from './mixkit-tile-game-reveal-960.wav';
+const socket = io(import.meta.env.VITE_SOCKET_URL);
 
-
-const socket = io.connect("http://localhost:1000")
 
 
 const App = () => {
