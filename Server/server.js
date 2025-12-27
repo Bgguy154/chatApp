@@ -1,50 +1,42 @@
-import express from 'express'
-import cors from 'cors'
-import { Server } from 'socket.io'
-import http from 'http'
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-
+import express from "express";
+import cors from "cors";
+import { Server } from "socket.io";
+import http from "http";
 
 const app = express();
 const server = http.createServer(app);
 
-app.use(express.static(path.join(__dirname,"../Client/dist")))
-
-app.get("/*",(req,res)=>{
-  res.sendFile(path.join(__dirname,"../Client/dist/index.html"));
-})
+// ✅ CORS FIRST
+app.use(cors({
+  origin: "https://chat-app-fyjx.vercel.app",
+  methods: ["GET", "POST"],
+}));
 
 const io = new Server(server, {
   cors: {
-    origin:"https://chat-app-fyjx.vercel.app/",
-    methods: ["GET", "PUT"],
+    origin: "https://chat-app-fyjx.vercel.app",
+    methods: ["GET", "POST"],
   },
 });
 
-io.on("connection",(socket)=>{console.log(socket.id)
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
 
-    socket.on("join_room",(data)=>{
-        socket.join(data);
-        console.log(`User ID :- ${socket.id} joined room : ${data}`)
-    })
+  socket.on("join_room", (room) => {
+    socket.join(room);
+    console.log(`User ${socket.id} joined room ${room}`);
+  });
 
-    socket.on("send_message",(data)=>{console.log("send message data ",data)
-    socket.to(data.room).emit("receive_message",data)
-})
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+  });
 
-    socket.on("disconnect",()=>{
-        console.log("User Disconnected..",socket.id)
-    })
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
 });
 
-
-
-app.use(cors());
-
-
-server.listen(1000,()=>console.log("Server is running on port 1000"));
+const PORT = process.env.PORT || 1000;
+server.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);
