@@ -1,13 +1,25 @@
+<<<<<<< HEAD
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import { Chat } from "./Chat";
 import music from "./mixkit-tile-game-reveal-960.wav";
+=======
+import React, { useState } from 'react'
+import io from 'socket.io-client'
+import { Chat } from './Chat'
+import music from './mixkit-tile-game-reveal-960.wav';
+
+
+const socket = io();
+
+>>>>>>> ae6b094 (Production ready deployment)
 
 const App = () => {
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [showChat, setShowChat] = useState(false);
 
+<<<<<<< HEAD
   const socketRef = useRef(null);
   const notificationRef = useRef(new Audio(music));
 
@@ -24,6 +36,21 @@ const App = () => {
       socketRef.current.disconnect();
     };
   }, []);
+=======
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState("");
+  const [showChat, setShowChat] = useState(false)
+
+  const notification = new Audio(music)
+
+  const joinChat = () => {
+    if (username !== "" && room !== "") {
+      socket.emit("join_room", room);
+      setShowChat(true)
+      notification.play();
+    }
+  };
+>>>>>>> ae6b094 (Production ready deployment)
 
   const joinChat = () => {
     if (!username || !room) return;
@@ -60,8 +87,22 @@ const App = () => {
       ) : (
         <Chat socket={socketRef.current} username={username} room={room} />
       )}
+<<<<<<< HEAD
+=======
+      {
+        showChat &&
+        (
+          <Chat socket={socket} username={username} room={room} />
+
+        )
+      }
+>>>>>>> ae6b094 (Production ready deployment)
     </>
   );
 };
 
+<<<<<<< HEAD
 export default App;
+=======
+export default App
+>>>>>>> ae6b094 (Production ready deployment)
